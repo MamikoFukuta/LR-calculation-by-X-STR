@@ -1,3 +1,4 @@
+
 ####files for calculation of likelihood ratio (LR)
 #file format#
 #"allelefreq" is the (number of allele type)*(number of loci) table of allele frequency.
@@ -73,12 +74,12 @@ patternFD <- function(n,loci,father,child,childfreq){
 	#"childfreq" <- result of "al_to_freq()" using genotype of daughter
 
 pattern <- matrix(0,loci,n)  #IBS pattern
-ibsfd <- matrix(0,loci,n*2)　#maternal alleles
-ibsfdfreq <- matrix(0,loci,n)　#maternal alleles frequencies
+ibsfd <- matrix(0,loci,n*2) #maternal alleles
+ibsfdfreq <- matrix(0,loci,n) #maternal alleles frequencies
 
 for(i in 1:n){
-	p1 <- matrix(0,loci,1)　
-	allele <- matrix(0,loci,2)　
+	p1 <- matrix(0,loci,1)
+	allele <- matrix(0,loci,2)
 	allelef <- matrix(0,loci,1)
 
 	for(al in 1:loci){
@@ -87,12 +88,12 @@ for(i in 1:n){
 				p1[al] <- 1 #A AA
 				allele[al,1] <- child[al,2*i-1]
 				allelef[al,] <- childfreq[al,2*i-1]
-			} else {p1[al] <- 3　#A BB
+			} else {p1[al] <- 3 #A BB
 				allele[al,1] <- child[al,2*i-1] 
 				allelef[al,] <- childfreq[al,2*i-1]
 			}    
 		}else if(child[al,2*i-1] != child[al,2*i]){ #hetero
-			if (father[al,i] == child[al,2*i-1]){　
+			if (father[al,i] == child[al,2*i-1]){
 				p1[al] <- 2 #A AB
 				allele[al,1] <- child[al,2*i] 
 				allelef[al,] <- childfreq[al,2*i]
@@ -441,4 +442,26 @@ LRloci[,i] <- LR1
 LRtotal <- apply(LRloci, MARGIN=2, prod)
 list(LRloci, LRtotal)
 }
-####
+
+
+######
+#how to use;
+######
+	allele <- daughter1m[[1]] #see "simulation_sample_generator"
+childfreq <- al_to_freq(n,loci,alnum,allele,allelefreq)
+	father <- father1
+	child <- daughter1m
+patternfd <- patternFD(n,loci,father,child,childfreq)
+	pattern <- patternfd[[1]]
+	ibsfd <- patternfd[[2]]
+	ldfreq <- patternfd[[3]]
+ldfreq <- LDclusterFD(n,LDlist,ld,pattern,ibsfd,ldfreq)
+Lx <- LcalcFD(n,loci,mu,pattern,ldfreq)
+
+patternur <- patternUR(n,loci,child,childfreq)
+	pattern <- patternur[[1]]
+	ldfreq <- patternur[[2]]
+Ly <- LDclusterUR(n,ld,LDlist,child,pattern,ldfreq)
+
+LR <- LRcalc(n,loci,Lx,Ly)
+

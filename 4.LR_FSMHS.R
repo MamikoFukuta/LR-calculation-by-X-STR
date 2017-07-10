@@ -76,13 +76,13 @@ patternFS <- function(n,loci,mu,rfreq,child1,child2,child1freq,child2freq){
 
 pattern <- matrix(0,loci,n)  #IBS pattern
 pIBD <- matrix(0,loci+1,n*5) #p(k0,k1,k2). p(k0) and p(k1) are devided into two lines which means Q and 1-Q.
-ibs12 <- matrix(0,loci,n*6)　#line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
-ibs12freq <- matrix(0,loci,n*6)　#allele frequencies corresponding to ibs12
+ibs12 <- matrix(0,loci,n*6) #line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
+ibs12freq <- matrix(0,loci,n*6 #allele frequencies corresponding to ibs12
 
 for(i in 1:n){
-	p1 <- matrix(0,loci,1)　
-	pIBD1 <- matrix(0,loci,5)　
-	allele <- matrix(0,loci,6)　
+	p1 <- matrix(0,loci,1)
+	pIBD1 <- matrix(0,loci,5)
+	allele <- matrix(0,loci,6)
 	allelef <- matrix(0,loci,6)
 
 	for(al in 1:loci){
@@ -92,9 +92,9 @@ for(i in 1:n){
 		b2 <- 0
 		c1 <- 0
 		c2 <- 0
-		Q <- 0 　　　　
+		Q <- 0 
 		
-		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 　
+		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 
 		if(child2[al,2*i-1] == child2[al,2*i])   a2 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i-1]) b1 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i])   b2 <- 1 
@@ -108,7 +108,7 @@ for(i in 1:n){
 			p1[al] <- 1
 			allele[al,c(1,3,5)] <- child2[al,2*i-1]
 			allelef[al,c(1,3,5)] <- child2freq[al,2*i-1]
-			Q <- (4-3*allelef[al,1])/(4-2*allelef[al,1])　
+			Q <- (4-3*allelef[al,1])/(4-2*allelef[al,1])
 			pIBD1[al,1] <- Q*mu*R2
 			pIBD1[al,2] <- (1-Q)*mu*R1
 			pIBD1[al,3] <- Q*(mu*R1+(1-mu)*R2)
@@ -411,13 +411,13 @@ patternMHS <- function(n,loci,rfreq,child1,child2,child1freq,child2freq){
 
 pattern <- matrix(0,loci,n)  #IBS pattern
 pIBD <- matrix(0,loci+1,n*3) #p(k0,k1). p(k0) is devided into two lines which means Q and 1-Q. The last row is dummy.
-ibsal <- matrix(0,loci,n*6)　#line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
-ibsf <- matrix(0,loci,n*6)　#allele frequencies corresponding to ibsal
+ibsal <- matrix(0,loci,n*6) #line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
+ibsf <- matrix(0,loci,n*6) #allele frequencies corresponding to ibsal
 pGenotype <- matrix(0,loci,n*3) #p(genotype|kj). j=0,1. p(genotype|k0) is devided into two lines corresponding to p(k0). 
 for(i in 1:n){
-	pat <- matrix(0,loci,1)　
-	pibd <- matrix(0,loci,3)　
-	allele <- matrix(0,loci,6)　
+	pat <- matrix(0,loci,1)
+	pibd <- matrix(0,loci,3)
+	allele <- matrix(0,loci,6)
 	allelef <- matrix(0,loci,6)
 	pG <- matrix(0,loci,3)
 
@@ -430,14 +430,14 @@ for(i in 1:n){
 		c2 <- 0
 		Q <- 0
 		
-		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 　
+		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 
 		if(child2[al,2*i-1] == child2[al,2*i])   a2 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i-1]) b1 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i])   b2 <- 1 
 		if(child1[al,2*i] == child2[al,2*i-1])   c1 <- 1 
 		if(child1[al,2*i] == child2[al,2*i])     c2 <- 1 
 
-		R1 <- (1-rfreq[al])^2+rfreq[al]^2　#recombination had not occurred in both of sisters or had occurred in both
+		R1 <- (1-rfreq[al])^2+rfreq[al]^2 #recombination had not occurred in both of sisters or had occurred in both
 		R2 <- 2*rfreq[al]*(1-rfreq[al]) #recombination had occurred in one of sisters
 
 		if(a1*a2*b1*b2*c1*c2 == 1){ #AA AA
@@ -746,6 +746,34 @@ LRloci[,i] <- LR1
 LRtotal <- apply(LRloci, MARGIN=2, prod)
 list(LRloci, LRtotal)
 }
-####
 
 
+######
+#how to use;
+######
+	allele <- daughter1m[[1]] #see "simulation_sample_generator"
+child1freq <- al_to_freq(n,loci,alnum,allele,allelefreq)
+	allele <- daughter3m[[1]] 
+child2freq <- al_to_freq(n,loci,alnum,allele,allelefreq)
+	child1 <- daughter1m[[1]] 
+	child2 <- daughter3m[[1]]
+
+patternfs <- patternFS(n,loci,mu,rfreq,child1,child2,child1freq,child2freq)
+	pattern <- patternfs[[1]]
+	ibs12 <- patternfs[[3]]
+LDfreq <- LDclusterFS(n,LDlist,ld,pattern,ibs12)
+	pIBD <- patterfs[[2]]
+	freq <- patternfs[[4]]
+Lx <- LcalcFS(n,loci,pattern,pIBD,freq,LDfreq)
+
+patternmhs <- patternMHS(n,loci,rfreq,child1,child2,child1freq,child2freq){
+	pattern <- patternmhs[[1]]
+	ibsal <- patternmhs[[3]]
+	ibsf <- patternmhs[[4]]
+	pGenotype <- patternmhs[[5]]
+LDclustermhs <- LDclusterMHS(n,LDlist,ld,pattern,ibsal,ibsf,pGenotype)
+	pIBD <- patternmhs[[2]]
+	pGenotype <- LDclustermhs
+Ly <- LcalcMHS(n,loci,pattern,pIBD,pGenotype)
+
+LR <- LRcalc(n,loci,Lx,Ly)

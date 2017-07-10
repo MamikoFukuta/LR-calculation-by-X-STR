@@ -1,5 +1,4 @@
 
-
 ###file for generating simulation sample 
 #Please set the number of lines (ncol) when scan() is used.
 #"SUMallelfreq" is the (number of allele type)*(number of loci) table of cumulative allele frequency.
@@ -15,7 +14,7 @@
 #	Please divide into two groups by the number of loci par cluster.
 #"rfreq" is the table of recombination rate.
 ###
-#exaple files;
+#example files;
 SUMallelefreq <- matrix(scan("sum27Xfreq.txt",skip=1,nlines=63),ncol=28,byrow=T)
 sumLD1 <- matrix(scan("sumLD1.txt",skip=1),ncol=4,byrow=T)
 sumLD2 <- matrix(scan("sumLD2.txt",skip=1),ncol=3,byrow=T)
@@ -33,6 +32,7 @@ alnum <- dim(SUMallelefreq)[1] #total number of kinds of allele
 loci <- dim(SUMallelefreq)[2]-1 #the number of marker
 ld2 <- c(9,18,26) #list of the first marker positions of two loci cluster. 
 ld3 <- c(5) #list of the first marker positions of three loci cluster.
+
 
 #####
 #generating mother
@@ -145,7 +145,7 @@ father <- function(n,loci,alnum,SUMallelefreq,LDlist2,LDlist3){
 #generating daughter
 ####
 
-daughter <- function(n,loci,rfreq,malset,faset){
+daughter <- function(n,loci,rfreq,malset,falset){
 
 #	"malset" <- result of mother(n)
 #	"falset" <- result of father(n)
@@ -156,7 +156,7 @@ daughter <- function(n,loci,rfreq,malset,faset){
 for (i in 1:n){ 
 	dre <- matrix(0,loci,1)
 	dal<- matrix(0,loci,1)
-	x1 <- runif(1) 　#the first locus
+	x1 <- runif(1) #the first locus
 	if (x1 < 0.5){
 		dal[1] <- malset[1,2*i-1]
 		dre[1] <- 1
@@ -165,7 +165,7 @@ for (i in 1:n){
 		dre[1] <- 2
 	}
 	
-	for (k in 2:loci){　#the following loci
+	for (k in 2:loci){#the following loci
 		if (dre[k-1] == 1){
 			s <- 1
 		}else s <- 2
@@ -189,8 +189,8 @@ for (i in 1:n){
 				dre[k] <- 1
 			}
 		}
-	)　　
-	}　
+	)
+	}
 	dset[,2*i] <- dal
 	dset[,2*i-1] <- falset[,i]
 	drecomb[,i] <- dre
@@ -223,5 +223,42 @@ for (i in 1:n*2){
 list(dsetm,dmut)
 }
 
+######
+#how to use;
+######
+mother1 <- mother(n,loci,alnum,SUMallelefreq,LDlist2,LDlist3) 
+father1 <- father(n,loci,alnum,SUMallelefreq,LDlist2,LDlist3)
+	malset <- mother1
+	falset <- father1
+daughter1 <- daughter(n,loci,rfreq,malset,falset)
+	dsetm <- daughter1[[1]]
+daughter1m <- mutation(n,mu,dsetm)
+daughter2 <- daughter(n,loci,rfreq,malset,falset)
+	dsetm <- daughter2[[1]]
+daughter2m <- mutation(n,mu,dsetm)
+#daughter1m and daughter2m are full sibling
 
+father2 <- father(n,loci,alnum,SUMallelefreq,LDlist2,LDlist3)
+	malset <- mother1
+	falset <- father2
+daughter3 <- daughter(n,loci,rfreq,malset,falset)
+	dsetm <- daughter3[[1]]
+daughter3m <- mutation(n,mu,dsetm)
+#daughter1m and daughter3m are maternal half sibling
 
+mother2 <- mother(n,loci,alnum,SUMallelefreq,LDlist2,LDlist3) 
+	malset <- mother2
+	falset <- father1
+daughter4 <- daughter(n,loci,rfreq,malset,falset)
+	dsetm <- daughter4[[1]]
+daughter4m <- mutation(n,mu,dsetm)
+#daughter1m and daughter4m are paternal half sibling
+
+mother3 <- mother(n,loci,alnum,SUMallelefreq,LDlist2,LDlist3) 
+father3 <- father(n,loci,alnum,SUMallelefreq,LDlist2,LDlist3)
+	malset <- mother3
+	falset <- father3
+daughter5 <- daughter(n,loci,rfreq,malset,falset)
+	dset <- daughter5[[1]]
+daughter5m <- mutation(n,mu,dsetm)
+#daughter1m and daughter5m are unrelated

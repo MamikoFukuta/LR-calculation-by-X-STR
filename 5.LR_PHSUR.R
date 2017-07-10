@@ -75,12 +75,12 @@ patternPHS <- function(n,loci,child1,child2,child1freq,child2freq){
 	#"child2freq" <- result of "al_to_freq()" using genotype of alleged child
 
 pattern <- matrix(0,loci,n)  #IBS pattern
-ibs12 <- matrix(0,loci,n*6)@#line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
-ibs12freq <- matrix(0,loci,n*6)@#allele frequencies corresponding to ibs12
+ibs12 <- matrix(0,loci,n*6) #line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
+ibs12freq <- matrix(0,loci,n*6) #allele frequencies corresponding to ibs12
 pGenotype <- matrix(0,loci,n*2) #p(genotype|kj). j=0,1
 for(i in 1:n){
-	pat <- matrix(0,loci,1)@
-	allele <- matrix(0,loci,6)@
+	pat <- matrix(0,loci,1)
+	allele <- matrix(0,loci,6)
 	allelef <- matrix(0,loci,6)
 	pG <- matrix(0,loci,2)
 
@@ -90,9 +90,9 @@ for(i in 1:n){
 		b1 <- 0
 		b2 <- 0
 		c1 <- 0
-		c2 <- 0@@@
+		c2 <- 0
 		
-		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 @
+		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 
 		if(child2[al,2*i-1] == child2[al,2*i])   a2 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i-1]) b1 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i])   b2 <- 1 
@@ -197,7 +197,7 @@ for (i in 1:n){
 		names(LD) <- c("L1","L2","HF")
 		k <- ld[j]
 		pG <-  matrix(0,1,2)
-		ldfreq <- matrix(0,1,2) #•ê—R—ˆƒAƒŠƒ‹‚Ìƒnƒvƒƒ^ƒCƒvðŒ•t‚«Šm—¦
+		ldfreq <- matrix(0,1,2) #æ¯ç”±æ¥ã‚¢ãƒªãƒ«ã®ãƒãƒ—ãƒ­ã‚¿ã‚¤ãƒ—æ¡ä»¶ä»˜ãç¢ºçŽ‡
 		malef <- matrix(0,length(unique(LD[,1])),2)
 		malef[,1]<- unique(LD[,1])
 		for (a in 1:length(unique(LD[,1]))){
@@ -549,5 +549,29 @@ LRloci[,i] <- LR1
 LRtotal <- apply(LRloci, MARGIN=2, prod)
 list(LRloci, LRtotal)
 }
-###################################
 
+
+######
+#how to use;
+######
+	allele <- daughter1m[[1]] #see "simulation_sample_generator"
+child1freq <- al_to_freq(n,loci,alnum,allele,allelefreq)
+	allele <- daughter4m[[1]] 
+child2freq <- al_to_freq(n,loci,alnum,allele,allelefreq)
+	child1 <- daughter1m[[1]] 
+	child2 <- daughter4m[[1]]
+
+patternphs <- patternPHS(n,loci,child1,child2,child1freq,child2freq)
+	pattern <- patternphs[[1]]
+	ibs12 <- patternphs[[2]]
+	pGenotype <- patternphs[[4]]
+LDclusterphs <- LDclusterPHS(n,LDlist,ld,pattern,ibs12,pGenotype)
+	pGenotype <- LDclusterphs
+Lx <- LcalcPHS(n,loci,mu,pattern,pGenotype)
+
+patternur <- patternUR(n,loci,child2,child2freq)
+	pattern <- patternur[[1]]
+	alfreq <-  patternur[[2]]
+Ly <- LDclusterUR(n,ld,LDlist,child2,pattern,alfreq)
+
+LR <- LRcalc(n,loci,Lx,Ly)
