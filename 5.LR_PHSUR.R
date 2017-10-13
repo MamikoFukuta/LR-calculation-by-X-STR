@@ -23,19 +23,18 @@ LD3 <- matrix(scan("LD3.txt",skip=1),ncol=3,byrow=T)
 LD4 <- matrix(scan("LD4.txt",skip=1),ncol=3,byrow=T)
 LDlist <- list(LD1_1,LD1_2,LD2,LD3,LD4)
 rfreq <- matrix(scan("r.txt"),nrow=1)
-PEfd <- matrix(scan("APEfd.txt"),nrow=1)
 PEsib <- matrix(scan("APEsib.txt"),nrow=1) 
 ####
 #parameters
 ####
 n <- 100000 #the number of pairs of sibling. 
 N <- 425 #the number of haplotypic databese.
-alnum <- dim(allelefreq)[1] #total number of kinds of allele
+alnum <- dim(allelefreq)[1] #total number of kinds of alleles
 loci <- dim(allelefreq)[2]-1 #the number of marker
 ld <- c(5,6,9,18,26) #list of marker positions of two loci cluster. 
-#	Only first number of each two loci cluster should be listed.
+#	Only the first number of each two loci cluster should be listed.
 #	If it is more than three loci cluster, list all position of loci except the last one.
-mu <- 0.0015 #mutation rate
+mu <- 0.0015 #mutation rate. If you use APE to calculate LR at a mutated locus, mu should be 0.
 newallele <- 0.001 #the frequency of unobserved allele. 
 
 ############
@@ -75,12 +74,12 @@ patternPHS <- function(n,loci,child1,child2,child1freq,child2freq){
 	#"child2freq" <- result of "al_to_freq()" using genotype of alleged child
 
 pattern <- matrix(0,loci,n)  #IBS pattern
-ibs12 <- matrix(0,loci,n*6) #line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
-ibs12freq <- matrix(0,loci,n*6) #allele frequencies corresponding to ibs12
+ibs12 <- matrix(0,loci,n*6)@#line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
+ibs12freq <- matrix(0,loci,n*6)@#allele frequencies corresponding to ibs12
 pGenotype <- matrix(0,loci,n*2) #p(genotype|kj). j=0,1
 for(i in 1:n){
-	pat <- matrix(0,loci,1)
-	allele <- matrix(0,loci,6)
+	pat <- matrix(0,loci,1)@
+	allele <- matrix(0,loci,6)@
 	allelef <- matrix(0,loci,6)
 	pG <- matrix(0,loci,2)
 
@@ -90,9 +89,9 @@ for(i in 1:n){
 		b1 <- 0
 		b2 <- 0
 		c1 <- 0
-		c2 <- 0
+		c2 <- 0@@@
 		
-		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 
+		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 @
 		if(child2[al,2*i-1] == child2[al,2*i])   a2 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i-1]) b1 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i])   b2 <- 1 
@@ -197,7 +196,7 @@ for (i in 1:n){
 		names(LD) <- c("L1","L2","HF")
 		k <- ld[j]
 		pG <-  matrix(0,1,2)
-		ldfreq <- matrix(0,1,2) #æ¯ç”±æ¥ã‚¢ãƒªãƒ«ã®ãƒãƒ—ãƒ­ã‚¿ã‚¤ãƒ—æ¡ä»¶ä»˜ãç¢ºçŽ‡
+		ldfreq <- matrix(0,1,2) #•ê—R—ˆƒAƒŠƒ‹‚Ìƒnƒvƒƒ^ƒCƒvðŒ•t‚«Šm—¦
 		malef <- matrix(0,length(unique(LD[,1])),2)
 		malef[,1]<- unique(LD[,1])
 		for (a in 1:length(unique(LD[,1]))){
@@ -328,8 +327,8 @@ LcalcPHS <- function(n,loci,mu,pattern,pGenotype){
 	#pGenotype <- result of LDclusterPHS
 
 Lloci <- matrix(0,loci,n)
-pIBD0 <- mu
-pIBD1 <- 1-mu
+pIBD0 <- 2*mu
+pIBD1 <- 1-2*mu
 for(i in 1:n){
 	LR1 <- matrix(0,loci,1)
 	for(k in 1:loci){
@@ -377,11 +376,11 @@ list(pattern,alfreq)
 #change independent loci to LD cluster
 ###
 
-LDclusterUR <- function(n,ld,LDlist,child2,pattern,alfreq){
+LDclusterUR <- function(n,ld,LDlist,child2,pattern,ldfreq){
 
 	#"child2" <- genotype of alleged child
 	#pattern <- result of patternUR[[1]]
-	#alfreq <- result of patternUR[[2]]
+	#ldfreq <- result of patternUR[[2]]
 
 for (i in 1:n){
 	for(j in 1:length(ld)){
@@ -528,28 +527,6 @@ LRloci[,i] <- LR1
 LRtotal <- apply(LRloci, MARGIN=2, prod)
 list(LRloci, LRtotal)
 }
-####
-
-############
-#calculation of likelihood ratio
-############
-LRcalc <- function(n,loci,Lx,Ly){
-
-	#LRx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
-	#LRy <- likelihood of alternative hypothesis (i.e. result of LDclusterUR())
-
-LRloci <- matrix(0,loci,n)
-for(i in 1:n){
-	LR1 <- matrix(0,loci,1)
-	for(k in 1:loci){
-		LR1[k] <- Lx[k,i]/Ly[k,i]
-	}
-LRloci[,i] <- LR1	
-}
-LRtotal <- apply(LRloci, MARGIN=2, prod)
-list(LRloci, LRtotal)
-}
-
 
 ######
 #how to use;
@@ -571,7 +548,8 @@ Lx <- LcalcPHS(n,loci,mu,pattern,pGenotype)
 
 patternur <- patternUR(n,loci,child2,child2freq)
 	pattern <- patternur[[1]]
-	alfreq <-  patternur[[2]]
-Ly <- LDclusterUR(n,ld,LDlist,child2,pattern,alfreq)
+	ldfreq <-  patternur[[2]]
+Ly <- LDclusterUR(n,ld,LDlist,child2,pattern,ldfreq)
 
-LR <- LRcalc(n,loci,Lx,Ly)
+LR <- LRcalc(n,loci,Lx,Ly) #Use 'LRcalcPE(n,loci,Lx,Ly)' when you want to use APE. 
+

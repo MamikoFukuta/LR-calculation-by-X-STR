@@ -9,8 +9,6 @@
 #	If you want to use three loci cluster, please divide the file(e.g. haplotype "ABC" to haplotype "AB" and "BC").
 #"LDlist" is the list of table of haplotype frequencies. 
 #"rfreq" is the table of recombination rate.
-#"PE" is the table of average probability of exclusion (APE).  
-#	This needs when you use APE to calculate LR at a mutated locus.
 #"genotype data" should be two rows for a female and one row for a male.
 #	Each line corresponds to locus and must line up from the short telomere side to the long telomere side.
 ###
@@ -23,8 +21,6 @@ LD3 <- matrix(scan("LD3.txt",skip=1),ncol=3,byrow=T)
 LD4 <- matrix(scan("LD4.txt",skip=1),ncol=3,byrow=T)
 LDlist <- list(LD1_1,LD1_2,LD2,LD3,LD4)
 rfreq <- matrix(scan("r.txt"),nrow=1)
-PEfd <- matrix(scan("APEfd.txt"),nrow=1)
-PEsib <- matrix(scan("APEsib.txt"),nrow=1) 
 ####
 #parameters
 ####
@@ -35,7 +31,7 @@ loci <- dim(allelefreq)[2]-1 #the number of marker
 ld <- c(5,6,9,18,26) #list of marker positions of two loci cluster. 
 #	Only first number of each two loci cluster should be listed.
 #	If it is more than three loci cluster, list all position of loci except the last one.
-mu <- 0.0015 #mutation rate
+mu <- 0.0015 #mutation rate. If you use APE to calculate LR at a mutated locus, mu should be 0.
 newallele <- 0.001 #the frequency of unobserved allele. 
 
 ############
@@ -76,13 +72,13 @@ patternFS <- function(n,loci,mu,rfreq,child1,child2,child1freq,child2freq){
 
 pattern <- matrix(0,loci,n)  #IBS pattern
 pIBD <- matrix(0,loci+1,n*5) #p(k0,k1,k2). p(k0) and p(k1) are devided into two lines which means Q and 1-Q.
-ibs12 <- matrix(0,loci,n*6) #line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
-ibs12freq <- matrix(0,loci,n*6 #allele frequencies corresponding to ibs12
+ibs12 <- matrix(0,loci,n*6)　#line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
+ibs12freq <- matrix(0,loci,n*6)　#allele frequencies corresponding to ibs12
 
 for(i in 1:n){
-	p1 <- matrix(0,loci,1)
-	pIBD1 <- matrix(0,loci,5)
-	allele <- matrix(0,loci,6)
+	p1 <- matrix(0,loci,1)　
+	pIBD1 <- matrix(0,loci,5)　
+	allele <- matrix(0,loci,6)　
 	allelef <- matrix(0,loci,6)
 
 	for(al in 1:loci){
@@ -92,9 +88,9 @@ for(i in 1:n){
 		b2 <- 0
 		c1 <- 0
 		c2 <- 0
-		Q <- 0 
+		Q <- 0 　　　　
 		
-		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 
+		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 　
 		if(child2[al,2*i-1] == child2[al,2*i])   a2 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i-1]) b1 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i])   b2 <- 1 
@@ -108,12 +104,12 @@ for(i in 1:n){
 			p1[al] <- 1
 			allele[al,c(1,3,5)] <- child2[al,2*i-1]
 			allelef[al,c(1,3,5)] <- child2freq[al,2*i-1]
-			Q <- (4-3*allelef[al,1])/(4-2*allelef[al,1])
-			pIBD1[al,1] <- Q*mu*R2
-			pIBD1[al,2] <- (1-Q)*mu*R1
-			pIBD1[al,3] <- Q*(mu*R1+(1-mu)*R2)
-			pIBD1[al,4] <- (1-Q)*(mu*R2+(1-mu)*R1)
-			pIBD1[al,5] <- Q*(1-mu)*R1+(1-Q)*(1-mu)*R2
+			Q <- (4-3*allelef[al,1])/(4-2*allelef[al,1])　
+			pIBD1[al,1] <- Q*2*mu*R2
+			pIBD1[al,2] <- (1-Q)*2*mu*R1
+			pIBD1[al,3] <- Q*(2*mu*R1+(1-2*mu)*R2)
+			pIBD1[al,4] <- (1-Q)*(2*mu*R2+(1-2*mu)*R1)
+			pIBD1[al,5] <- Q*(1-2*mu)*R1+(1-Q)*(1-2*mu)*R2
 		}else if(a1 == 1 && a2 == 0 && b1+b2 != 0){ #AA AB
 			p1[al] <- 2
 			allele[al,1] <- child1[al,2*i-1] 
@@ -122,9 +118,9 @@ for(i in 1:n){
 			allelef[al,1] <- child1freq[al,2*i-1] 
 			allelef[al,3] <- child2freq[al,2*i-1]*b2+child2freq[al,2*i]*b1 
 			allelef[al,5] <- child1freq[al,2*i-1] 
-			pIBD1[al,1] <- mu*R1
-			pIBD1[al,3] <- mu*R2+(1-mu)*R1
-			pIBD1[al,5] <- (1-mu)*R2
+			pIBD1[al,1] <- 2*mu*R1
+			pIBD1[al,3] <- 2*mu*R2+(1-2*mu)*R1
+			pIBD1[al,5] <- (1-2*mu)*R2
 		}else if(a1 == 0 && a2 == 1 && b1+c1 != 0){ #AB AA
 			p1[al] <- 3
 			allele[al,1] <- child2[al,2*i-1] 
@@ -133,9 +129,9 @@ for(i in 1:n){
 			allelef[al,1] <- child2freq[al,2*i-1] 
 			allelef[al,3] <- child2freq[al,2*i-1] 
 			allelef[al,5] <- child1freq[al,2*i-1]*c1+child1freq[al,2*i]*b1 
-			pIBD1[al,1] <- mu*R1
-			pIBD1[al,3] <- mu*R2+(1-mu)*R1
-			pIBD1[al,5] <- (1-mu)*R2
+			pIBD1[al,1] <- 2*mu*R1
+			pIBD1[al,3] <- 2*mu*R2+(1-2*mu)*R1
+			pIBD1[al,5] <- (1-2*mu)*R2
 		}else if(a1+a2 == 0 && b1+b2 == 1 && c1+c2 == 1){ #AB AB
 			p1[al] <- 4
 			allele[al,c(1,3,5)] <- child2[al,2*i-1]
@@ -143,11 +139,11 @@ for(i in 1:n){
 			allelef[al,c(1,3,5)] <- child2freq[al,2*i-1]
 			allelef[al,c(2,4,6)] <- child2freq[al,2*i]
 			Q <- ((4-3*allelef[al,1])/(4-2*allelef[al,1]) + (4-3*allelef[al,2])/(4-2*allelef[al,2])) /2
-			pIBD1[al,1] <- Q*mu*R2
-			pIBD1[al,2] <- (1-Q)*mu*R1
-			pIBD1[al,3] <- Q*(mu*R1+(1-mu)*R2)
-			pIBD1[al,4] <- (1-Q)*(mu*R2+(1-mu)*R1)
-			pIBD1[al,5] <- Q*(1-mu)*R1+(1-Q)*(1-mu)*R2
+			pIBD1[al,1] <- Q*2*mu*R2
+			pIBD1[al,2] <- (1-Q)*2*mu*R1
+			pIBD1[al,3] <- Q*(2*mu*R1+(1-2*mu)*R2)
+			pIBD1[al,4] <- (1-Q)*(2*mu*R2+(1-2*mu)*R1)
+			pIBD1[al,5] <- Q*(1-2*mu)*R1+(1-Q)*(1-2*mu)*R2
 		}else if(a1+a2 == 0 && b1+b2 == 1 || c1+c2 == 1){ #AB AC
 			p1[al] <- 5
 			allele[al,1] <- child2[al,2*i-1]*(b1+c1)+child2[al,2*i]*(b2+c2)
@@ -156,9 +152,9 @@ for(i in 1:n){
 			allelef[al,1] <- child2freq[al,2*i-1]*(b1+c1)+child2freq[al,2*i]*(b2+c2)
 			allelef[al,3] <- child2freq[al,2*i-1]*(b2+c2)+child2freq[al,2*i]*(b1+c1)
 			allelef[al,5] <- child1freq[al,2*i-1]*(c1+c2)+child1freq[al,2*i]*(b1+b2)
-			pIBD1[al,1] <- mu*R1
-			pIBD1[al,3] <- mu*R2+(1-mu)*R1
-			pIBD1[al,5] <- (1-mu)*R2
+			pIBD1[al,1] <- 2*mu*R1
+			pIBD1[al,3] <- 2*mu*R2+(1-2*mu)*R1
+			pIBD1[al,5] <- (1-2*mu)*R2
 		}else { #AB CD || AB CC || AA BC || AA BB
 			p1[al] <- 6 
 			allele[al,3] <- child2[al,2*i-1]
@@ -169,17 +165,17 @@ for(i in 1:n){
 			allelef[al,4] <- child2freq[al,2*i]
 			allelef[al,5] <- child1freq[al,2*i-1]
 			allelef[al,6] <- child1freq[al,2*i]
-			pIBD1[al,1] <- mu*R1
-			pIBD1[al,3] <- mu*R2+(1-mu)*R1
-			pIBD1[al,5] <- (1-mu)*R2
+			pIBD1[al,1] <- 2*mu*R1
+			pIBD1[al,3] <- 2*mu*R2+(1-2*mu)*R1
+			pIBD1[al,5] <- (1-2*mu)*R2
 		}	
 	}#al
 	pattern[,i] <- p1
 	ibs12[,(6*i-5):(6*i)] <- allele[,1:6]
 	ibs12freq[,(6*i-5):(6*i)] <- allelef[,1:6]
-	pIBD[1,5*i-4] <- 0.5*mu
-	pIBD[1,5*i-2] <- 0.5*mu+0.5*(1-mu) 
-	pIBD[1,5*i] <- 0.5*(1-mu) 
+	pIBD[1,5*i-4] <- 0.5*2*mu
+	pIBD[1,5*i-2] <- 0.5*2*mu+0.5*(1-2*mu) 
+	pIBD[1,5*i] <- 0.5*(1-2*mu) 
 	pIBD[2:(loci+1),(5*i-4):(5*i)] <- pIBD1[,1:5]
 }#i
 list(pattern,pIBD,ibs12,ibs12freq)
@@ -411,13 +407,13 @@ patternMHS <- function(n,loci,rfreq,child1,child2,child1freq,child2freq){
 
 pattern <- matrix(0,loci,n)  #IBS pattern
 pIBD <- matrix(0,loci+1,n*3) #p(k0,k1). p(k0) is devided into two lines which means Q and 1-Q. The last row is dummy.
-ibsal <- matrix(0,loci,n*6) #line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
-ibsf <- matrix(0,loci,n*6) #allele frequencies corresponding to ibsal
+ibsal <- matrix(0,loci,n*6)　#line12=IBSalleles, line34=nonIBSalleles of child2,line56=nonIBSalleles of child1
+ibsf <- matrix(0,loci,n*6)　#allele frequencies corresponding to ibsal
 pGenotype <- matrix(0,loci,n*3) #p(genotype|kj). j=0,1. p(genotype|k0) is devided into two lines corresponding to p(k0). 
 for(i in 1:n){
-	pat <- matrix(0,loci,1)
-	pibd <- matrix(0,loci,3)
-	allele <- matrix(0,loci,6)
+	pat <- matrix(0,loci,1)　
+	pibd <- matrix(0,loci,3)　
+	allele <- matrix(0,loci,6)　
 	allelef <- matrix(0,loci,6)
 	pG <- matrix(0,loci,3)
 
@@ -430,14 +426,14 @@ for(i in 1:n){
 		c2 <- 0
 		Q <- 0
 		
-		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 
+		if(child1[al,2*i-1] == child1[al,2*i])   a1 <- 1 　
 		if(child2[al,2*i-1] == child2[al,2*i])   a2 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i-1]) b1 <- 1 
 		if(child1[al,2*i-1] == child2[al,2*i])   b2 <- 1 
 		if(child1[al,2*i] == child2[al,2*i-1])   c1 <- 1 
 		if(child1[al,2*i] == child2[al,2*i])     c2 <- 1 
 
-		R1 <- (1-rfreq[al])^2+rfreq[al]^2 #recombination had not occurred in both of sisters or had occurred in both
+		R1 <- (1-rfreq[al])^2+rfreq[al]^2　#recombination had not occurred in both of sisters or had occurred in both
 		R2 <- 2*rfreq[al]*(1-rfreq[al]) #recombination had occurred in one of sisters
 
 		if(a1*a2*b1*b2*c1*c2 == 1){ #AA AA
@@ -720,34 +716,6 @@ list(LRloci, LRtotal)
 }
 
 
-
-############
-#calculation of likelihood ratio using APE
-############
-LRcalcPE <- function(n,APE,pattern,Lx,Ly){
-	
-	#APE <- PEsib
-	#pattern <- result of patternFS[[1]]
-	#LRx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
-	#LRy <- likelihood of alternative hypothesis (i.e. result of LDclusterUR())
-
-LRloci <- matrix(0,loci,n)
-for(i in 1:n){
-	LR1 <- matrix(0,loci,1)
-	for(k in 1:loci){
-		if(pattern[k,i] == 6){
-			LR1[k] <- APE[k]
-		} else {
-			LR1[k] <- Lx[k,i]/Ly[k,i]
-		}
-	}
-LRloci[,i] <- LR1	
-}
-LRtotal <- apply(LRloci, MARGIN=2, prod)
-list(LRloci, LRtotal)
-}
-
-
 ######
 #how to use;
 ######
@@ -762,7 +730,7 @@ patternfs <- patternFS(n,loci,mu,rfreq,child1,child2,child1freq,child2freq)
 	pattern <- patternfs[[1]]
 	ibs12 <- patternfs[[3]]
 LDfreq <- LDclusterFS(n,LDlist,ld,pattern,ibs12)
-	pIBD <- patterfs[[2]]
+	pIBD <- patternfs[[2]]
 	freq <- patternfs[[4]]
 Lx <- LcalcFS(n,loci,pattern,pIBD,freq,LDfreq)
 

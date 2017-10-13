@@ -1,4 +1,3 @@
-
 ####files for calculation of likelihood ratio (LR)
 #file format#
 #"allelefreq" is the (number of allele type)*(number of loci) table of allele frequency.
@@ -25,7 +24,6 @@ LD4 <- matrix(scan("LD4.txt",skip=1),ncol=3,byrow=T)
 LDlist <- list(LD1_1,LD1_2,LD2,LD3,LD4)
 rfreq <- matrix(scan("r.txt"),nrow=1)
 PEfd <- matrix(scan("APEfd.txt"),nrow=1)
-PEsib <- matrix(scan("APEsib.txt"),nrow=1) 
 ####
 #parameters
 ####
@@ -36,7 +34,7 @@ loci <- dim(allelefreq)[2]-1 #the number of marker
 ld <- c(5,6,9,18,26) #list of marker positions of two loci cluster. 
 #	Only first number of each two loci cluster should be listed.
 #	If it is more than three loci cluster, list all position of loci except the last one.
-mu <- 0.0015 #mutation rate
+mu <- 0.0015 #mutation rate. If you use APE to calculate LR at a mutated locus, mu should be 0.
 newallele <- 0.001 #the frequency of unobserved allele. 
 
 ############
@@ -74,12 +72,12 @@ patternFD <- function(n,loci,father,child,childfreq){
 	#"childfreq" <- result of "al_to_freq()" using genotype of daughter
 
 pattern <- matrix(0,loci,n)  #IBS pattern
-ibsfd <- matrix(0,loci,n*2) #maternal alleles
-ibsfdfreq <- matrix(0,loci,n) #maternal alleles frequencies
+ibsfd <- matrix(0,loci,n*2)　#maternal alleles
+ibsfdfreq <- matrix(0,loci,n)　#maternal alleles frequencies
 
 for(i in 1:n){
-	p1 <- matrix(0,loci,1)
-	allele <- matrix(0,loci,2)
+	p1 <- matrix(0,loci,1)　
+	allele <- matrix(0,loci,2)　
 	allelef <- matrix(0,loci,1)
 
 	for(al in 1:loci){
@@ -88,12 +86,12 @@ for(i in 1:n){
 				p1[al] <- 1 #A AA
 				allele[al,1] <- child[al,2*i-1]
 				allelef[al,] <- childfreq[al,2*i-1]
-			} else {p1[al] <- 3 #A BB
+			} else {p1[al] <- 3　#A BB
 				allele[al,1] <- child[al,2*i-1] 
 				allelef[al,] <- childfreq[al,2*i-1]
 			}    
 		}else if(child[al,2*i-1] != child[al,2*i]){ #hetero
-			if (father[al,i] == child[al,2*i-1]){
+			if (father[al,i] == child[al,2*i-1]){　
 				p1[al] <- 2 #A AB
 				allele[al,1] <- child[al,2*i] 
 				allelef[al,] <- childfreq[al,2*i]
@@ -443,7 +441,6 @@ LRtotal <- apply(LRloci, MARGIN=2, prod)
 list(LRloci, LRtotal)
 }
 
-
 ######
 #how to use;
 ######
@@ -463,5 +460,4 @@ patternur <- patternUR(n,loci,child,childfreq)
 	ldfreq <- patternur[[2]]
 Ly <- LDclusterUR(n,ld,LDlist,child,pattern,ldfreq)
 
-LR <- LRcalc(n,loci,Lx,Ly)
-
+LR <- LRcalc(n,loci,Lx,Ly)  #Use 'LRcalcPE(n,loci,Lx,Ly)' when you want to use APE. 
