@@ -422,14 +422,14 @@ LRcalcPE <- function(n,APE,pattern,Lx,Ly){
 	
 	#APE <- PEfd
 	#pattern <- result of patternFD[[1]]
-	#LRx <- likelihood of hypothesis questioned (i.e. result of LcalcFD())
-	#LRy <- likelihood of alternative hypothesis (i.e. result of LDclusterUR())
+	#Lx <- likelihood of hypothesis questioned (i.e. result of LcalcFD())
+	#Ly <- likelihood of alternative hypothesis (i.e. result of LDclusterUR())
 
 LRloci <- matrix(0,loci,n)
 for(i in 1:n){
 	LR1 <- matrix(0,loci,1)
 	for(k in 1:loci){
-		if(pattern[k,i] == 6){
+		if(pattern[k,i] == 3 || pattern[k,i] == 4){
 			LR1[k] <- APE[k]
 		} else {
 			LR1[k] <- Lx[k,i]/Ly[k,i]
@@ -460,4 +460,4 @@ patternur <- patternUR(n,loci,child,childfreq)
 	ldfreq <- patternur[[2]]
 Ly <- LDclusterUR(n,ld,LDlist,child,pattern,ldfreq)
 
-LR <- LRcalc(n,loci,Lx,Ly)  #Use 'LRcalcPE(n,loci,Lx,Ly)' when you want to use APE. 
+LR <- LRcalc(n,loci,Lx,Ly)  #Use 'LRcalcPE(n,APE,pattern,Lx,Ly)' when you want to use APE. 

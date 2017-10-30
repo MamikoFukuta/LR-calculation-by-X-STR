@@ -700,8 +700,8 @@ return(Lloci)
 ############
 LRcalc <- function(n,loci,Lx,Ly){
 
-	#LRx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
-	#LRy <- likelihood of alternative hypothesis (i.e. result of LcalcMHS())
+	#Lx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
+	#Ly <- likelihood of alternative hypothesis (i.e. result of LcalcMHS())
 
 LRloci <- matrix(0,loci,n)
 for(i in 1:n){
