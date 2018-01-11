@@ -1,4 +1,5 @@
 
+
 ###file for generating simulation sample 
 #Please set the number of lines (ncol) when scan() is used.
 #"SUMallelfreq" is the (number of allele type)*(number of loci) table of cumulative allele frequency.
@@ -14,7 +15,7 @@
 #	Please divide into two groups by the number of loci par cluster.
 #"rfreq" is the table of recombination rate.
 ###
-#example files;
+#exaple files;
 SUMallelefreq <- matrix(scan("sum27Xfreq.txt",skip=1,nlines=63),ncol=28,byrow=T)
 sumLD1 <- matrix(scan("sumLD1.txt",skip=1),ncol=4,byrow=T)
 sumLD2 <- matrix(scan("sumLD2.txt",skip=1),ncol=3,byrow=T)
@@ -32,7 +33,6 @@ alnum <- dim(SUMallelefreq)[1] #total number of kinds of allele
 loci <- dim(SUMallelefreq)[2]-1 #the number of marker
 ld2 <- c(9,18,26) #list of the first marker positions of two loci cluster. 
 ld3 <- c(5) #list of the first marker positions of three loci cluster.
-
 
 #####
 #generating mother
@@ -145,7 +145,7 @@ father <- function(n,loci,alnum,SUMallelefreq,LDlist2,LDlist3){
 #generating daughter
 ####
 
-daughter <- function(n,loci,rfreq,malset,falset){
+daughter <- function(n,loci,rfreq,malset,faset){
 
 #	"malset" <- result of mother(n)
 #	"falset" <- result of father(n)
@@ -156,7 +156,7 @@ daughter <- function(n,loci,rfreq,malset,falset){
 for (i in 1:n){ 
 	dre <- matrix(0,loci,1)
 	dal<- matrix(0,loci,1)
-	x1 <- runif(1) #the first locus
+	x1 <- runif(1) 　#the first locus
 	if (x1 < 0.5){
 		dal[1] <- malset[1,2*i-1]
 		dre[1] <- 1
@@ -165,7 +165,7 @@ for (i in 1:n){
 		dre[1] <- 2
 	}
 	
-	for (k in 2:loci){#the following loci
+	for (k in 2:loci){　#the following loci
 		if (dre[k-1] == 1){
 			s <- 1
 		}else s <- 2
@@ -189,8 +189,8 @@ for (i in 1:n){
 				dre[k] <- 1
 			}
 		}
-	)
-	}
+	)　　
+	}　
 	dset[,2*i] <- dal
 	dset[,2*i-1] <- falset[,i]
 	drecomb[,i] <- dre
@@ -262,3 +262,4 @@ daughter5 <- daughter(n,loci,rfreq,malset,falset)
 	dset <- daughter5[[1]]
 daughter5m <- mutation(n,mu,dsetm)
 #daughter1m and daughter5m are unrelated
+

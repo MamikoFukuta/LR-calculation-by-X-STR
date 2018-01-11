@@ -370,21 +370,25 @@ for(i in 1:n){
 
 		switch(s, 
 		"1" = {if(pattern[k,i] == 1){
-				LR1[k,] <- pIBD[k,5*i-2]*2*freq[k,6*i-3] + pIBD[k,5*i-1]*2*LDfreq[j,2*i-1] + pIBD[k,5*i]
+				LR1[k,] <- pIBD[k,5*i-2]*freq[k,6*i-3] + pIBD[k,5*i-1]*LDfreq[j,2*i-1] + pIBD[k,5*i]
 			} else if(pattern[k,i] == 4){
-				LR1[k,] <- pIBD[k,5*i-2]*(freq[k,6*i-3]+freq[k,6*i-2]) + pIBD[k,5*i-1]*(LDfreq[j,2*i-1]+LDfreq[j,2*i]) + pIBD[k,5*i]
-			} else if(pattern[k,i] == 2 || pattern[k,i] == 3 || pattern[k,i] == 5) {
-				LR1[k,] <- pIBD[k,5*i-2]*freq[k,6*i-3] + pIBD[k,5*i-1]*LDfreq[j,2*i-1] 			
+				LR1[k,] <- pIBD[k,5*i-2]*(freq[k,6*i-3]+freq[k,6*i-2])/2 + pIBD[k,5*i-1]*(LDfreq[j,2*i-1]+LDfreq[j,2*i])/2 + pIBD[k,5*i]
+			} else if(pattern[k,i] == 2) {
+				LR1[k,] <- pIBD[k,5*i-2]*freq[k,6*i-3] + pIBD[k,5*i-1]*LDfreq[j,2*i-1] 	
+			} else if(pattern[k,i] == 3 || pattern[k,i] == 5) {
+				LR1[k,] <- pIBD[k,5*i-2]*freq[k,6*i-3]/2 + pIBD[k,5*i-1]*LDfreq[j,2*i-1]/2 					
 			} else if(pattern[k,i] == 6){
 				LR1[k,] <- pIBD[k,5*i-4]*(freq[k,6*i-3]+freq[k,6*i-2])/2 + pIBD[k,5*i-3]*(LDfreq[j,2*i-1]+LDfreq[j,2*i])/2
 			}
 		},
 		"2" = {if(pattern[k,i] == 1){
-				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*2*freq[k,6*i-3] + pIBD[k,5*i]				
+				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*freq[k,6*i-3] + pIBD[k,5*i]				
 			} else if(pattern[k,i] == 4){
-				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*(freq[k,6*i-3]+freq[k,6*i-2]) + pIBD[k,5*i]				
-			} else if(pattern[k,i] == 2 || pattern[k,i] == 3 || pattern[k,i] == 5) {
+				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*(freq[k,6*i-3]+freq[k,6*i-2])/2 + pIBD[k,5*i]				
+			} else if(pattern[k,i] == 2) {
 				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*freq[k,6*i-3] 
+			} else if(pattern[k,i] == 3 || pattern[k,i] == 5) {
+				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*freq[k,6*i-3]/2 
 			} else if(pattern[k,i] == 6){
 				LR1[k,] <- (pIBD[k,5*i-4]+pIBD[k,5*i-3])*(freq[k,6*i-3]+freq[k,6*i-2])/2
 			}
@@ -563,8 +567,8 @@ LRcalcPE <- function(n,APE,pattern,Lx,Ly){
 	
 	#APE <- PEsib
 	#pattern <- result of patternFS[[1]]
-	#Lx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
-	#Ly <- likelihood of alternative hypothesis (i.e. result of LDclusterUR())
+	#LRx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
+	#LRy <- likelihood of alternative hypothesis (i.e. result of LDclusterUR())
 
 LRloci <- matrix(0,loci,n)
 for(i in 1:n){
@@ -605,4 +609,4 @@ patternur <- patternUR(n,loci,child2,child2freq)
 	ldfreq <-  patternur[[2]]
 Ly <- LDclusterUR(n,ld,LDlist,child2,pattern,ldfreq)
 
-LR <- LRcalc(n,loci,Lx,Ly) #Use 'LRcalcPE(n,APE,pattern,Lx,Ly)' when you want to use APE. 
+LR <- LRcalc(n,loci,Lx,Ly) #Use 'LRcalcPE(n,loci,Lx,Ly)' when you want to use APE. 

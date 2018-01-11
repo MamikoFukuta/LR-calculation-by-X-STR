@@ -367,21 +367,25 @@ for(i in 1:n){
 
 		switch(s, 
 		"1" = {if(pattern[k,i] == 1){
-				LR1[k,] <- pIBD[k,5*i-2]*2*freq[k,6*i-3] + pIBD[k,5*i-1]*2*LDfreq[j,2*i-1] + pIBD[k,5*i]
+				LR1[k,] <- pIBD[k,5*i-2]*freq[k,6*i-3] + pIBD[k,5*i-1]*LDfreq[j,2*i-1] + pIBD[k,5*i]
 			} else if(pattern[k,i] == 4){
-				LR1[k,] <- pIBD[k,5*i-2]*(freq[k,6*i-3]+freq[k,6*i-2]) + pIBD[k,5*i-1]*(LDfreq[j,2*i-1]+LDfreq[j,2*i]) + pIBD[k,5*i]
-			} else if(pattern[k,i] == 2 || pattern[k,i] == 3 || pattern[k,i] == 5) {
-				LR1[k,] <- pIBD[k,5*i-2]*freq[k,6*i-3] + pIBD[k,5*i-1]*LDfreq[j,2*i-1] 			
+				LR1[k,] <- pIBD[k,5*i-2]*(freq[k,6*i-3]+freq[k,6*i-2])/2 + pIBD[k,5*i-1]*(LDfreq[j,2*i-1]+LDfreq[j,2*i])/2 + pIBD[k,5*i]
+			} else if(pattern[k,i] == 2) {
+				LR1[k,] <- pIBD[k,5*i-2]*freq[k,6*i-3] + pIBD[k,5*i-1]*LDfreq[j,2*i-1] 	
+			} else if(pattern[k,i] == 3 || pattern[k,i] == 5) {
+				LR1[k,] <- pIBD[k,5*i-2]*freq[k,6*i-3]/2 + pIBD[k,5*i-1]*LDfreq[j,2*i-1]/2 					
 			} else if(pattern[k,i] == 6){
 				LR1[k,] <- pIBD[k,5*i-4]*(freq[k,6*i-3]+freq[k,6*i-2])/2 + pIBD[k,5*i-3]*(LDfreq[j,2*i-1]+LDfreq[j,2*i])/2
 			}
 		},
 		"2" = {if(pattern[k,i] == 1){
-				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*2*freq[k,6*i-3] + pIBD[k,5*i]				
+				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*freq[k,6*i-3] + pIBD[k,5*i]				
 			} else if(pattern[k,i] == 4){
-				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*(freq[k,6*i-3]+freq[k,6*i-2]) + pIBD[k,5*i]				
-			} else if(pattern[k,i] == 2 || pattern[k,i] == 3 || pattern[k,i] == 5) {
+				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*(freq[k,6*i-3]+freq[k,6*i-2])/2 + pIBD[k,5*i]				
+			} else if(pattern[k,i] == 2) {
 				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*freq[k,6*i-3] 
+			} else if(pattern[k,i] == 3 || pattern[k,i] == 5) {
+				LR1[k,] <- (pIBD[k,5*i-2]+pIBD[k,5*i-1])*freq[k,6*i-3]/2 
 			} else if(pattern[k,i] == 6){
 				LR1[k,] <- (pIBD[k,5*i-4]+pIBD[k,5*i-3])*(freq[k,6*i-3]+freq[k,6*i-2])/2
 			}
@@ -441,7 +445,7 @@ for(i in 1:n){
 			allele[al,c(1,3,5)] <- child2[al,2*i-1]
 			allelef[al,c(1,3,5)] <- child2freq[al,2*i-1]
 			pG[al,1:2] <- allelef[al,1]^2
-			pG[al,3] <- 2*allelef[al,1]
+			pG[al,3] <- allelef[al,1]
 			Q <- 1/(1+allelef[al,1]) 
 			pibd[al,1] <- Q*R2
 			pibd[al,2] <- (1-Q)*R1
@@ -472,7 +476,7 @@ for(i in 1:n){
 			allelef[al,5] <- child1freq[al,2*i-1]*c1+child1freq[al,2*i]*b1 
 			Q <- 1/(1+2*allelef[al,1])
 			pG[al,1:2] <- allelef[al,1]^2
-			pG[al,3] <- allelef[al,1]
+			pG[al,3] <- allelef[al,1]/2
 			pibd[al,1] <- Q*R2
 			pibd[al,2] <- (1-Q)*R1
 			pibd[al,3] <- Q*R1 + (1-Q)*R2
@@ -484,7 +488,7 @@ for(i in 1:n){
 			allelef[al,c(1,3,5)] <- child2freq[al,2*i-1]
 			allelef[al,c(2,4,6)] <- child2freq[al,2*i]
 			pG[al,1:2] <- 2*allelef[al,1]*allelef[al,2]
-			pG[al,3] <- allelef[al,1]+allelef[al,2]
+			pG[al,3] <- (allelef[al,1]+allelef[al,2])/2
 			Q <- (allelef[al,1]+allelef[al,2])/(allelef[al,1]+allelef[al,2]+4*allelef[al,1]*allelef[al,2])			
 			pibd[al,1] <- Q*R2
 			pibd[al,2] <- (1-Q)*R1
@@ -500,7 +504,7 @@ for(i in 1:n){
 			allelef[al,5] <- child1freq[al,2*i-1]*(c1+c2)+child1freq[al,2*i]*(b1+b2)
 			Q <- 1/(1+4*allelef[al,1])
 			pG[al,1:2] <- 2*allelef[al,1]*allelef[al,3]
-			pG[al,3] <- allelef[al,3]
+			pG[al,3] <- allelef[al,3]/2
 			pibd[al,1] <- Q*R2
 			pibd[al,2] <- (1-Q)*R1
 			pibd[al,3] <- Q*R1 + (1-Q)*R2
@@ -646,23 +650,27 @@ for (i in 1:n){
 		}
 
 		if (pattern[k+1,i] == 1){#AA AA
-			pG[,1] <- ibsf[k+1,(6*i-5)] * (cpa[1,1] + cpa[1,2]) /2	#Q
+			pG[,1] <- ibsf[k+1,(6*i-5)] * sum(cpa[1,c(1,2)])/2	#Q
 			pG[,2] <- (cma[1,1] * cpa[1,2] + cma[1,2] * cpa[1,1]) /2	#1-Q
-			pG[,3] <- cpa[1,3] + cpa[1,4]
-		}else if (pattern[k+1,i] == 2 ||  pattern[k+1,i] == 5){#AA AB, AB AC
-			pG[,1] <- (ibsf[k+1,6*i-5] * sum(cpa[1,c(3,4)]) + ibsf[k+1,6*i-3] * sum(cpa[1,c(1,2)])) /2 
+			pG[,3] <- sum(cpa[1,c(3,4)])/2
+		}else if (pattern[k+1,i] == 2){#AA AB
+			pG[,1] <- ibsf[k+1,6*i-5] * sum(cpa[1,c(3,4)])/2 + ibsf[k+1,6*i-3] * sum(cpa[1,c(1,2)])/2 
 			pG[,2] <- (cma[1,1] * cpa[1,4] + cma[1,2] * cpa[1,3] + cma[1,3] * cpa[1,2] + cma[1,4] * cpa[1,1]) /2 
-			pG[,3] <- (cpa[1,3] + cpa[1,4]) /2
+			pG[,3] <- sum(cpa[1,c(3,4)])/2
 		}else if (pattern[k+1,i] == 3 ){ #AB AA
-			pG[,1] <- ibsf[k+1,(6*i-5)] * (cpa[1,1] + cpa[1,2]) /2	
+			pG[,1] <- ibsf[k+1,(6*i-5)] * sum(cpa[1,c(1,2)])/2	
 			pG[,2] <- (cma[1,1] * cpa[1,2] + cma[1,2] * cpa[1,1]) /2	
-			pG[,3] <- (cpa[1,3] + cpa[1,4]) /2
+			pG[,3] <- sum(cpa[1,c(3,4)])/4
 		}else if (pattern[k+1,i] == 4 ){ #AB AB
-			pG[,1] <- (ibsf[k+1,6*i-5] * sum(cpa[1,c(3,4)]) + ibsf[k+1,6*i-3] * sum(cpa[1,c(1,2)])) /2 
+			pG[,1] <- ibsf[k+1,6*i-5] * sum(cpa[1,c(3,4)])/2 + ibsf[k+1,6*i-3] * sum(cpa[1,c(1,2)])/2 
 			pG[,2] <- (cma[1,1] * cpa[1,4] + cma[1,2] * cpa[1,3] + cma[1,3] * cpa[1,2] + cma[1,4] * cpa[1,1]) /2 
-			pG[,3] <- (cpa[1,1] + cpa[1,2]) /2 + (cpa[1,3] + cpa[1,4]) /2
+			pG[,3] <- sum(cpa[1,c(1:4)])/4 
+		}else if (pattern[k+1,i] == 5){#AB AC
+			pG[,1] <- ibsf[k+1,6*i-5] * sum(cpa[1,c(3,4)])/2 + ibsf[k+1,6*i-3] * sum(cpa[1,c(1,2)])/2 
+			pG[,2] <- (cma[1,1] * cpa[1,4] + cma[1,2] * cpa[1,3] + cma[1,3] * cpa[1,2] + cma[1,4] * cpa[1,1]) /2 
+			pG[,3] <- sum(cpa[1,c(3,4)])/4
 		}else if (pattern[k+1,i] == 6 ){ #AB CD
-			pG[,1] <- (ibsf[k+1,6*i-5] * sum(cpa[1,c(3,4)]) + ibsf[k+1,6*i-3] * sum(cpa[1,c(1,2)])) /2 
+			pG[,1] <- ibsf[k+1,6*i-5] * sum(cpa[1,c(3,4)])/2 + ibsf[k+1,6*i-3] * sum(cpa[1,c(1,2)])/2 
 			pG[,2] <- (cma[1,1] * cpa[1,4] + cma[1,2] * cpa[1,3] + cma[1,3] * cpa[1,2] + cma[1,4] * cpa[1,1]) /2  
 		}else if (pattern[k+1,i] == 7 ){ #AB CC
 			pG[,1] <- ibsf[k+1,(6*i-5)] * (cpa[1,1] + cpa[1,2]) /2	
@@ -700,8 +708,8 @@ return(Lloci)
 ############
 LRcalc <- function(n,loci,Lx,Ly){
 
-	#Lx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
-	#Ly <- likelihood of alternative hypothesis (i.e. result of LcalcMHS())
+	#LRx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
+	#LRy <- likelihood of alternative hypothesis (i.e. result of LcalcMHS())
 
 LRloci <- matrix(0,loci,n)
 for(i in 1:n){

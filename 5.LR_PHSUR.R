@@ -103,7 +103,7 @@ for(i in 1:n){
 			allele[al,c(1,3,5)] <- child2[al,2*i-1]
 			allelef[al,c(1,3,5)] <- child2freq[al,2*i-1]
 			pG[al,1] <- 0
-			pG[al,2] <- 2*allelef[al,3]
+			pG[al,2] <- allelef[al,3]
 
 		}else if(a1 == 1 && a2 == 0 && b1+b2 != 0){ #AA AB
 			pat[al] <- 2
@@ -125,7 +125,7 @@ for(i in 1:n){
 			allelef[al,3] <- child2freq[al,2*i-1] 
 			allelef[al,5] <- child1freq[al,2*i-1]*c1+child1freq[al,2*i]*b1
 			pG[al,1] <- 0
-			pG[al,2] <- allelef[al,3]
+			pG[al,2] <- allelef[al,3]/2
 
 		}else if(a1+a2 == 0 && b1+b2 == 1 && c1+c2 == 1){ #AB AB
 			pat[al] <- 4
@@ -134,7 +134,7 @@ for(i in 1:n){
 			allelef[al,c(1,3,5)]<- child2freq[al,2*i-1]
 			allelef[al,c(2,4,6)] <- child2freq[al,2*i]
 			pG[al,1] <- 0
-			pG[al,2] <- allelef[al,1]+allelef[al,2]
+			pG[al,2] <- (allelef[al,1]+allelef[al,2])/2
 
 		}else if(a1+a2 == 0 && b1+b2 == 1 || c1+c2 == 1){ #AB AC
 			pat[al] <- 5
@@ -145,7 +145,7 @@ for(i in 1:n){
 			allelef[al,3] <- child2freq[al,2*i-1]*(b2+c2)+child2freq[al,2*i]*(b1+c1)
 			allelef[al,5] <- child1freq[al,2*i-1]*(c1+c2)+child1freq[al,2*i]*(b1+b2)
 			pG[al,1] <- 0
-			pG[al,2] <- allelef[al,3]
+			pG[al,2] <- allelef[al,3]/2
 
 		}else if(a2 == 0 && b1+b2+c1+c2 == 0){ #AB CD || AA BC 
 			pat[al] <- 6 
@@ -206,8 +206,8 @@ for (i in 1:n){
 		}
 		Malef <- data.frame(L1=malef[,1],AF=malef[,2])
 
-		if(pattern[k,i] == 1 || pattern[k,i] == 2 ||  pattern[k,i] == 3 || pattern[k,i] == 5){ 
-			if (pattern[k+1,i] == 1 || pattern[k+1,i] == 2 || pattern[k+1,i] == 3 || pattern[k+1,i] == 5){ 
+		if(pattern[k,i] == 1 || pattern[k,i] == 2 ||  pattern[k,i] == 3 || pattern[k,i] == 5 || pattern[k,i] == 7){ 
+			if (pattern[k+1,i] == 1 || pattern[k+1,i] == 2 || pattern[k+1,i] == 3 || pattern[k+1,i] == 5 || pattern[k+1,i] == 7){ 
 				locus1 <- c(ibs12[k,6*i-3])
 				locus2 <- c(ibs12[k+1,6*i-3])
 				id <- c(1:length(locus1))
@@ -228,7 +228,7 @@ for (i in 1:n){
 				}
 				ldfreq[1,1] <- condfreq[,4]
 
-			} else if (pattern[k+1,i] == 4 || pattern[k+1,i] == 6 || pattern[k+1,i] == 7 ){
+			} else if (pattern[k+1,i] == 4 || pattern[k+1,i] == 6 ){
 				locus1 <- c(rep(ibs12[k,6*i-3],2))
 				locus2 <- c(ibs12[k+1,6*i-3],ibs12[k+1,6*i-2])
 				id <- c(1:length(locus1))
@@ -250,8 +250,8 @@ for (i in 1:n){
 				ldfreq[1,1] <- condfreq[1,4]
 				ldfreq[1,2] <- condfreq[2,4]
 			} 
-		} else if(pattern[k,i] == 4 || pattern[k,i] == 6 || pattern[k,i] == 7){
-			if (pattern[k+1,i] == 1 || pattern[k+1,i] == 2 || pattern[k+1,i] == 3 || pattern[k+1,i] == 5){ 
+		} else if(pattern[k,i] == 4 || pattern[k,i] == 6 ){
+			if (pattern[k+1,i] == 1 || pattern[k+1,i] == 2 || pattern[k+1,i] == 3 || pattern[k+1,i] == 5 || pattern[k+1,i] == 7){ 
 				locus1 <- c(ibs12[k,(6*i-3):(6*i-2)])
 				locus2 <- c(rep(ibs12[k+1,6*i-3],2))
 				id <- c(1:length(locus1))
@@ -272,7 +272,7 @@ for (i in 1:n){
 				}
 				ldfreq[1,1] <- sum(condfreq[,4])/2
 
-			} else if (pattern[k+1,i] == 4 || pattern[k+1,i] == 6 || pattern[k+1,i] == 7 ){ 
+			} else if (pattern[k+1,i] == 4 || pattern[k+1,i] == 6 ){ 
 				locus1 <- c(ibs12[k,(6*i-3):(6*i-2)])
 				locus2 <- c(rep(ibs12[k+1,6*i-3],2),rep(ibs12[k+1,6*i-2],2))
 				id <- c(1:length(locus1))
@@ -296,19 +296,21 @@ for (i in 1:n){
 			} 
 		}
 
-		if (pattern[k+1,i] == 1){
+		if (pattern[k+1,i] == 3 || pattern[k+1,i] == 5){
 			pG[,1] <- 0 
-			pG[,2] <- 2*ldfreq[1,1]					
-		}else if (pattern[k+1,i] == 2 || pattern[k+1,i] == 3 || pattern[k+1,i] == 5){
+			pG[,2] <- ldfreq[1,1]/2					
+		}else if (pattern[k+1,i] == 1 || pattern[k+1,i] == 2){
 			pG[,1] <- 0
 			pG[,2] <- ldfreq[1,1]
-		}else if (pattern[k+1,i] == 4 ){
+		}else if (pattern[k+1,i] == 4){
 			pG[,1] <- 0
-			pG[,2] <- ldfreq[1,1]+ldfreq[1,2]
-		}else if (pattern[k+1,i] == 6 ){
+			pG[,2] <- (ldfreq[1,1]+ldfreq[1,2])/2
+		}else if (pattern[k+1,i] == 6){
 			pG[,1] <- (ldfreq[1,1]+ldfreq[1,2])/2
-		}else if (pattern[k+1,i] == 7 ){
+			pG[,2] <- 0
+		}else if (pattern[k+1,i] == 7){
 			pG[,1] <- ldfreq[1,1]
+			pG[,2] <- 0
 		}
 	pGenotype[k+1,(2*i-1):(2*i)] <- pG
 	}#j
@@ -508,15 +510,15 @@ list(LRloci, LRtotal)
 LRcalcPE <- function(n,APE,pattern,Lx,Ly){
 	
 	#APE <- PEsib
-	#pattern <- result of patternFS[[1]]
-	#Lx <- likelihood of hypothesis questioned (i.e. result of LcalcFS())
-	#Ly <- likelihood of alternative hypothesis (i.e. result of LDclusterUR())
+	#pattern <- result of patternPHS[[1]]
+	#LRx <- likelihood of hypothesis questioned (i.e. result of LcalcPHS())
+	#LRy <- likelihood of alternative hypothesis (i.e. result of LDclusterUR())
 
 LRloci <- matrix(0,loci,n)
 for(i in 1:n){
 	LR1 <- matrix(0,loci,1)
 	for(k in 1:loci){
-		if(pattern[k,i] == 6 || pattern[k,i] == 7){
+		if(pattern[k,i] == 6 || pattern[k,i] == 7 ){
 			LR1[k] <- APE[k]
 		} else {
 			LR1[k] <- Lx[k,i]/Ly[k,i]
@@ -551,5 +553,5 @@ patternur <- patternUR(n,loci,child2,child2freq)
 	ldfreq <-  patternur[[2]]
 Ly <- LDclusterUR(n,ld,LDlist,child2,pattern,ldfreq)
 
-LR <- LRcalc(n,loci,Lx,Ly) #Use 'LRcalcPE(n,APE,pattern,Lx,Ly)' when you want to use APE. 
+LR <- LRcalc(n,loci,Lx,Ly) #Use 'LRcalcPE(n,loci,Lx,Ly)' when you want to use APE. 
 
